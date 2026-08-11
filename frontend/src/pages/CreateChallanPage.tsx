@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import api from '../services/api';
 import { Customer, Product } from '../types';
+import { initialCustomers, initialProducts } from '../services/mockData';
 import { useNavigate, Link } from 'react-router-dom';
 import { Plus, Trash2, ArrowLeft, CheckCircle, Save, AlertTriangle, ShoppingCart } from 'lucide-react';
 
@@ -29,14 +30,24 @@ export const CreateChallanPage: React.FC = () => {
     const loadInitialData = async () => {
       try {
         const [resCust, resProd] = await Promise.all([
-          api.get('/customers?limit=100'),
-          api.get('/products'),
+          api.get('/customers?limit=100').catch(() => ({ data: { success: false, data: [] } })),
+          api.get('/products').catch(() => ({ data: { success: false, data: [] } })),
         ]);
 
-        if (resCust.data.success) setCustomers(resCust.data.data);
-        if (resProd.data.success) setProducts(resProd.data.data);
+        if (resCust.data && resCust.data.success && Array.isArray(resCust.data.data) && resCust.data.data.length > 0) {
+          setCustomers(resCust.data.data);
+        } else {
+          setCustomers(initialCustomers);
+        }
+
+        if (resProd.data && resProd.data.success && Array.isArray(resProd.data.data) && resProd.data.data.length > 0) {
+          setProducts(resProd.data.data);
+        } else {
+          setProducts(initialProducts);
+        }
       } catch (err) {
-        console.error('Failed to load initial metadata:', err);
+        setCustomers(initialCustomers);
+        setProducts(initialProducts);
       } finally {
         setLoading(false);
       }

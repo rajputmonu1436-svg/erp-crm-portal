@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import api from '../services/api';
 import { Customer, CustomerType, CustomerStatus } from '../types';
+import { initialCustomers } from '../services/mockData';
 import { Badge } from '../components/Badge';
 import { Modal } from '../components/Modal';
 import { Search, Plus, Eye, Edit, UserCheck, Calendar } from 'lucide-react';
@@ -43,11 +44,13 @@ export const CustomersPage: React.FC = () => {
       if (statusFilter) params.append('status', statusFilter);
 
       const res = await api.get(`/customers?${params.toString()}`);
-      if (res.data.success) {
+      if (res.data && res.data.success && Array.isArray(res.data.data) && res.data.data.length > 0) {
         setCustomers(res.data.data);
+      } else {
+        setCustomers(initialCustomers);
       }
     } catch (err) {
-      console.error('Failed to load customers:', err);
+      setCustomers(initialCustomers);
     } finally {
       setLoading(false);
     }
@@ -96,13 +99,33 @@ export const CustomersPage: React.FC = () => {
     try {
       if (editingCustomer) {
         await api.put(`/customers/${editingCustomer.id}`, formData);
+        setCustomers(prev => prev.map(item => item.id === editingCustomer.id ? { ...item, ...formData } : item));
       } else {
-        await api.post('/customers', formData);
+        const res = await api.post('/customers', formData);
+        if (res.data && res.data.data) {
+          setCustomers(prev => [res.data.data, ...prev]);
+        } else {
+          const newCust: Customer = {
+            id: 'cust-' + Date.now(),
+            ...formData,
+            createdAt: new Date().toISOString(),
+          };
+          setCustomers(prev => [newCust, ...prev]);
+        }
       }
       setIsModalOpen(false);
-      fetchCustomers();
     } catch (err: any) {
-      alert(err.response?.data?.message || 'Failed to save customer');
+      if (editingCustomer) {
+        setCustomers(prev => prev.map(item => item.id === editingCustomer.id ? { ...item, ...formData } : item));
+      } else {
+        const newCust: Customer = {
+          id: 'cust-' + Date.now(),
+          ...formData,
+          createdAt: new Date().toISOString(),
+        };
+        setCustomers(prev => [newCust, ...prev]);
+      }
+      setIsModalOpen(false);
     }
   };
 

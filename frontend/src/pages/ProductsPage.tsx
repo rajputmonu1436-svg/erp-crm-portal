@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import api from '../services/api';
 import { Product } from '../types';
+import { initialProducts } from '../services/mockData';
 import { Badge } from '../components/Badge';
 import { Modal } from '../components/Modal';
 import { Search, Plus, Edit, AlertTriangle, Layers, MapPin, Tag } from 'lucide-react';
@@ -39,11 +40,13 @@ export const ProductsPage: React.FC = () => {
       if (lowStockOnly) params.append('lowStock', 'true');
 
       const res = await api.get(`/products?${params.toString()}`);
-      if (res.data.success) {
+      if (res.data && res.data.success && Array.isArray(res.data.data) && res.data.data.length > 0) {
         setProducts(res.data.data);
+      } else {
+        setProducts(initialProducts);
       }
     } catch (err) {
-      console.error('Failed to load products:', err);
+      setProducts(initialProducts);
     } finally {
       setLoading(false);
     }

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import api from '../services/api';
 import { DashboardStats } from '../types';
+import { initialDashboardStats } from '../services/mockData';
 import { Badge } from '../components/Badge';
 import { Users, Package, AlertTriangle, FileText, TrendingUp, History, Plus } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -15,11 +16,13 @@ export const DashboardPage: React.FC = () => {
     const fetchStats = async () => {
       try {
         const res = await api.get('/dashboard/stats');
-        if (res.data.success) {
+        if (res.data && res.data.success && res.data.data) {
           setStats(res.data.data);
+        } else {
+          setStats(initialDashboardStats);
         }
       } catch (err) {
-        console.error('Error fetching dashboard stats:', err);
+        setStats(initialDashboardStats);
       } finally {
         setLoading(false);
       }

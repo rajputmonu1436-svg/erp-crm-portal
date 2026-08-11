@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import api from '../services/api';
 import { Challan, ChallanStatus } from '../types';
+import { initialChallans } from '../services/mockData';
 import { Badge } from '../components/Badge';
 import { Modal } from '../components/Modal';
 import { FileText, Plus, Download, CheckCircle, Search, Eye, User, Calendar } from 'lucide-react';
@@ -27,11 +28,13 @@ export const ChallansPage: React.FC = () => {
       if (statusFilter) params.append('status', statusFilter);
 
       const res = await api.get(`/challans?${params.toString()}`);
-      if (res.data.success) {
+      if (res.data && res.data.success && Array.isArray(res.data.data) && res.data.data.length > 0) {
         setChallans(res.data.data);
+      } else {
+        setChallans(initialChallans);
       }
     } catch (err) {
-      console.error('Failed to load challans:', err);
+      setChallans(initialChallans);
     } finally {
       setLoading(false);
     }

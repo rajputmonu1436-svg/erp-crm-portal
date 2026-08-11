@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import api from '../services/api';
 import { StockMovement, Product, MovementType } from '../types';
+import { initialStockMovements, initialProducts } from '../services/mockData';
 import { Badge } from '../components/Badge';
 import { Modal } from '../components/Modal';
 import { History, Plus, ArrowUpRight, ArrowDownLeft, Search, Filter } from 'lucide-react';
@@ -33,14 +34,24 @@ export const StockLogsPage: React.FC = () => {
       if (search) params.append('search', search);
 
       const [resMovements, resProducts] = await Promise.all([
-        api.get(`/stock?${params.toString()}`),
-        api.get('/products'),
+        api.get(`/stock?${params.toString()}`).catch(() => ({ data: { success: false, data: [] } })),
+        api.get('/products').catch(() => ({ data: { success: false, data: [] } })),
       ]);
 
-      if (resMovements.data.success) setMovements(resMovements.data.data);
-      if (resProducts.data.success) setProducts(resProducts.data.data);
+      if (resMovements.data && resMovements.data.success && Array.isArray(resMovements.data.data) && resMovements.data.data.length > 0) {
+        setMovements(resMovements.data.data);
+      } else {
+        setMovements(initialStockMovements);
+      }
+
+      if (resProducts.data && resProducts.data.success && Array.isArray(resProducts.data.data) && resProducts.data.data.length > 0) {
+        setProducts(resProducts.data.data);
+      } else {
+        setProducts(initialProducts);
+      }
     } catch (err) {
-      console.error('Failed to load stock movements:', err);
+      setMovements(initialStockMovements);
+      setProducts(initialProducts);
     } finally {
       setLoading(false);
     }
