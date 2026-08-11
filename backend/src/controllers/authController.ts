@@ -7,7 +7,75 @@ import { AppError } from '../middleware/errorHandler';
 
 const prisma = new PrismaClient();
 
+const ensureSeeded = async () => {
+  try {
+    const count = await prisma.user.count();
+    if (count === 0) {
+      const adminPassword = await bcrypt.hash('admin123', 10);
+      const salesPassword = await bcrypt.hash('sales123', 10);
+      const warehousePassword = await bcrypt.hash('warehouse123', 10);
+      const accountsPassword = await bcrypt.hash('accounts123', 10);
+
+      const admin = await prisma.user.create({
+        data: { name: 'System Admin', email: 'admin@company.com', password: adminPassword, role: 'ADMIN' },
+      });
+      const sales = await prisma.user.create({
+        data: { name: 'Sarah Sales', email: 'sales@company.com', password: salesPassword, role: 'SALES' },
+      });
+      await prisma.user.create({
+        data: { name: 'Wally Warehouse', email: 'warehouse@company.com', password: warehousePassword, role: 'WAREHOUSE' },
+      });
+      await prisma.user.create({
+        data: { name: 'Adam Accounts', email: 'accounts@company.com', password: accountsPassword, role: 'ACCOUNTS' },
+      });
+
+      // Seed Initial Customers
+      await prisma.customer.create({
+        data: {
+          name: 'Rajesh Kumar',
+          mobile: '+91 9876543210',
+          email: 'rajesh@apexretail.com',
+          businessName: 'Apex Retail Store',
+          gstNumber: '27AAAAA0000A1Z5',
+          type: 'RETAIL',
+          address: 'Sector 18, Noida, UP',
+          status: 'ACTIVE',
+          createdById: sales.id,
+        },
+      });
+
+      // Seed Initial Products
+      await prisma.product.create({
+        data: {
+          name: 'Industrial Grade Steel Bolt',
+          sku: 'PRD-BOLT-01',
+          category: 'Hardware',
+          unitPrice: 15.50,
+          currentStock: 450,
+          minStockAlert: 100,
+          location: 'Rack A-12',
+        },
+      });
+      await prisma.product.create({
+        data: {
+          name: 'Premium Copper Wire (100m)',
+          sku: 'PRD-WIRE-25',
+          category: 'Electrical',
+          unitPrice: 1850.00,
+          currentStock: 85,
+          minStockAlert: 20,
+          location: 'Shelf E-01',
+        },
+      });
+      console.log('✅ Auto-seeded initial test accounts & sample data');
+    }
+  } catch (err) {
+    console.error('Auto-seed check note:', err);
+  }
+};
+
 export const login = async (req: AuthenticatedRequest, res: Response) => {
+  await ensureSeeded();
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -45,6 +113,7 @@ export const login = async (req: AuthenticatedRequest, res: Response) => {
 };
 
 export const register = async (req: AuthenticatedRequest, res: Response) => {
+  await ensureSeeded();
   const { name, email, password, role } = req.body;
 
   if (!name || !email || !password) {
