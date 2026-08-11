@@ -1,0 +1,291 @@
+{
+  "info": {
+    "name": "Mini ERP + CRM Operations Portal API",
+    "_postman_id": "b1a2c3d4-e5f6-7890-abcd-ef1234567890",
+    "description": "Complete REST API collection for Mini ERP + CRM Operations Portal. Includes authentication, role-based access control, Customer CRM, Product Inventory, Stock Movement Audit Logs, and Sales Challans with PDF export.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Login (Admin / Sales / Warehouse / Accounts)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@company.com\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Get Current Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "me"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Customer CRM",
+      "item": [
+        {
+          "name": "List Customers (with search & filters)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/customers?type=RETAIL&status=ACTIVE",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "customers"],
+              "query": [
+                { "key": "type", "value": "RETAIL" },
+                { "key": "status", "value": "ACTIVE" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Customer",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Rohan Verma\",\n  \"mobile\": \"+91 9811223344\",\n  \"email\": \"rohan@starelectronics.com\",\n  \"businessName\": \"Star Electronics Store\",\n  \"gstNumber\": \"27CBAAB1234C1Z9\",\n  \"type\": \"WHOLESALE\",\n  \"address\": \"Building 12, Tech Park, Pune, MH\",\n  \"status\": \"LEAD\",\n  \"notes\": \"Interested in bulk wiring supplies.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/customers",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "customers"]
+            }
+          }
+        },
+        {
+          "name": "Get Customer By ID (with Timeline)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/customers/CUSTOMER_ID_HERE",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "customers", "CUSTOMER_ID_HERE"]
+            }
+          }
+        },
+        {
+          "name": "Add CRM Follow-up Note",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"note\": \"Spoke with procurement manager. Approved draft quotation.\",\n  \"followUpDate\": \"2026-08-20\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/customers/CUSTOMER_ID_HERE/follow-ups",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "customers", "CUSTOMER_ID_HERE", "follow-ups"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Product & Inventory",
+      "item": [
+        {
+          "name": "Get Products List",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products"]
+            }
+          }
+        },
+        {
+          "name": "Get Low Stock Alerts",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/products?lowStock=true",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products"],
+              "query": [{ "key": "lowStock", "value": "true" }]
+            }
+          }
+        },
+        {
+          "name": "Create Product",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Brass Fittings 1/2 inch\",\n  \"sku\": \"PRD-BRASS-50\",\n  \"category\": \"Hardware\",\n  \"unitPrice\": 85.00,\n  \"currentStock\": 200,\n  \"minStockAlert\": 30,\n  \"location\": \"Rack D-02\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Stock Movement Logs",
+      "item": [
+        {
+          "name": "Get Movement Logs",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/stock",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "stock"]
+            }
+          }
+        },
+        {
+          "name": "Manual Stock Adjustment (IN / OUT)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": \"PRODUCT_ID_HERE\",\n  \"quantity\": 50,\n  \"type\": \"IN\",\n  \"reason\": \"Supplier Restock Shipment Received PO #4091\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/stock/adjust",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "stock", "adjust"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Sales Challans",
+      "item": [
+        {
+          "name": "List Sales Challans",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/challans",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "challans"]
+            }
+          }
+        },
+        {
+          "name": "Create Sales Challan (Draft or Confirmed)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"CUSTOMER_ID_HERE\",\n  \"status\": \"CONFIRMED\",\n  \"items\": [\n    {\n      \"productId\": \"PRODUCT_ID_HERE\",\n      \"quantity\": 5\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/challans",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "challans"]
+            }
+          }
+        },
+        {
+          "name": "Update Challan Status (Draft -> Confirmed)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwtToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"CONFIRMED\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/challans/CHALLAN_ID_HERE/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "challans", "CHALLAN_ID_HERE", "status"]
+            }
+          }
+        },
+        {
+          "name": "Download PDF Invoice",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/challans/CHALLAN_ID_HERE/pdf",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "challans", "CHALLAN_ID_HERE", "pdf"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "item": [
+        {
+          "name": "Get Dashboard KPIs",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{jwtToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/dashboard/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "dashboard", "stats"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000" },
+    { "key": "jwtToken", "value": "YOUR_JWT_TOKEN_HERE" }
+  ]
+}
