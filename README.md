@@ -79,20 +79,20 @@ Project mearn/
 
 - **Backend**: Node.js, Express, TypeScript, Prisma ORM, JWT, BcryptJS, PDFKit.
 - **Frontend**: React 18, Vite, TypeScript, React Router v6, Lucide Icons, Custom CSS Design System.
-- **Database**: SQLite (Zero-config instant local setup, 100% compatible with PostgreSQL/MySQL via Prisma provider switch).
+- **Database**: PostgreSQL (Prisma ORM with clean UUID primary keys, fully supported locally and via cloud providers like Supabase, Neon, Render Postgres).
 
 ---
 
 ## 🚀 How to Run Locally
 
-### Option A: Standard Node.js Setup
+### Option A: Standard Setup (PostgreSQL)
 
 #### 1. Backend Setup
 ```bash
 cd backend
 npm install
 
-# Initialize Database Schema & Run Seeding
+# Initialize Database Schema & Run PostgreSQL Seeding
 npx prisma db push
 npm run seed
 
@@ -113,9 +113,9 @@ Open `http://localhost:3000` in your web browser.
 
 ---
 
-### Option B: Docker Setup
+### Option B: 1-Click Docker Setup (Includes PostgreSQL)
 
-Run the entire stack with a single command using Docker Compose:
+Run the entire stack (PostgreSQL 15 Database + Node Backend + React Frontend) with a single command:
 
 ```bash
 docker-compose up --build
@@ -123,6 +123,7 @@ docker-compose up --build
 
 - **Frontend**: `http://localhost:3000`
 - **Backend API**: `http://localhost:5000`
+- **PostgreSQL DB**: `localhost:5432` (`user: postgres`, `password: postgres`, `db: mini_erp`)
 
 ---
 
@@ -135,6 +136,7 @@ Import the included `postman_collection.json` file into Postman.
 | Module | Method | Endpoint | Description |
 |---|---|---|---|
 | **Auth** | `POST` | `/api/auth/login` | Authenticate user & get JWT token |
+| **Auth** | `POST` | `/api/auth/register` | Create new user account |
 | **Auth** | `GET` | `/api/auth/me` | Fetch logged-in user profile |
 | **CRM** | `GET` | `/api/customers` | List customers (search, type & status filters) |
 | **CRM** | `POST` | `/api/customers` | Add new customer profile |
@@ -156,12 +158,12 @@ Import the included `postman_collection.json` file into Postman.
 
 ### Free Cloud Deployment Options:
 - **Backend API**: Render.com, Railway.app, or Fly.io (Node.js web service).
-- **Database**: Supabase, Neon.tech, or Render PostgreSQL.
+- **Database**: Supabase, Neon.tech, or Render Postgres.
 - **Frontend**: Vercel, Netlify, or Render Static Site.
 
 #### Environment Variables for Deployment:
 - `PORT`: `5000`
-- `DATABASE_URL`: `file:./dev.db` (or PostgreSQL connection URI e.g., `postgresql://...`)
+- `DATABASE_URL`: `postgresql://postgres:postgres@localhost:5432/mini_erp?schema=public` (or Supabase/Neon connection string)
 - `JWT_SECRET`: `your_random_secret_key`
 - `JWT_EXPIRES_IN`: `7d`
 - `NODE_ENV`: `production`
@@ -170,6 +172,7 @@ Import the included `postman_collection.json` file into Postman.
 
 ## 📝 Assumptions & Known Limitations
 
-1. **Database Provider**: SQLite is configured by default for zero-config local evaluation without requiring a PostgreSQL service process running locally. Changing the provider to `postgresql` in `prisma/schema.prisma` enables instant production cloud database compatibility.
+1. **Database Architecture**: PostgreSQL is configured via Prisma ORM with relational UUID primary keys and cascading foreign key constraints.
 2. **Currency**: Pricing and totals assume INR (`₹`) formatting.
 3. **Stock Dispatches**: Cancelling a confirmed sales challan is restricted by default to preserve audit log consistency; stock restocks can be performed using the Stock Adjustment module.
+

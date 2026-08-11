@@ -3,12 +3,12 @@ generator client {
 }
 
 datasource db {
-  provider = "mongodb"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id             String          @id @default(auto()) @map("_id") @db.ObjectId
+  id             String          @id @default(uuid())
   name           String
   email          String          @unique
   password       String
@@ -22,7 +22,7 @@ model User {
 }
 
 model Customer {
-  id           String         @id @default(auto()) @map("_id") @db.ObjectId
+  id           String         @id @default(uuid())
   name         String
   mobile       String
   email        String
@@ -33,7 +33,7 @@ model Customer {
   status       String         @default("LEAD")
   followUpDate DateTime?
   notes        String?
-  createdById  String         @db.ObjectId
+  createdById  String
   createdBy    User           @relation("UserCustomers", fields: [createdById], references: [id])
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
@@ -42,17 +42,17 @@ model Customer {
 }
 
 model FollowUpNote {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  customerId  String   @db.ObjectId
+  id          String   @id @default(uuid())
+  customerId  String
   customer    Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
   note        String
-  createdById String   @db.ObjectId
+  createdById String
   createdBy   User     @relation("UserFollowUpNotes", fields: [createdById], references: [id])
   createdAt   DateTime @default(now())
 }
 
 model Product {
-  id             String          @id @default(auto()) @map("_id") @db.ObjectId
+  id             String          @id @default(uuid())
   name           String
   sku            String          @unique
   category       String
@@ -68,26 +68,26 @@ model Product {
 }
 
 model StockMovement {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  productId   String   @db.ObjectId
+  id          String   @id @default(uuid())
+  productId   String
   product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   quantity    Int
   type        String   // "IN" | "OUT"
   reason      String
-  createdById String   @db.ObjectId
+  createdById String
   createdBy   User     @relation("UserStockMovements", fields: [createdById], references: [id])
   createdAt   DateTime @default(now())
 }
 
 model Challan {
-  id            String        @id @default(auto()) @map("_id") @db.ObjectId
+  id            String        @id @default(uuid())
   challanNumber String        @unique
-  customerId    String        @db.ObjectId
+  customerId    String
   customer      Customer      @relation(fields: [customerId], references: [id])
   status        String        @default("DRAFT")
   totalQuantity Int
   totalAmount   Float
-  createdById   String        @db.ObjectId
+  createdById   String
   createdBy     User          @relation("UserChallans", fields: [createdById], references: [id])
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
@@ -95,10 +95,10 @@ model Challan {
 }
 
 model ChallanItem {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  challanId   String   @db.ObjectId
+  id          String   @id @default(uuid())
+  challanId   String
   challan     Challan  @relation(fields: [challanId], references: [id], onDelete: Cascade)
-  productId   String   @db.ObjectId
+  productId   String
   product     Product  @relation(fields: [productId], references: [id])
   productName String
   sku         String
@@ -107,3 +107,4 @@ model ChallanItem {
   subtotal    Float
   createdAt   DateTime @default(now())
 }
+
