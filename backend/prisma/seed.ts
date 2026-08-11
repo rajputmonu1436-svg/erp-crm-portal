@@ -7,14 +7,14 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('🌱 Starting database seeding...');
 
-  // Clean existing data
-  await prisma.challanItem.deleteMany();
-  await prisma.challan.deleteMany();
-  await prisma.stockMovement.deleteMany();
-  await prisma.followUpNote.deleteMany();
-  await prisma.customer.deleteMany();
-  await prisma.product.deleteMany();
-  await prisma.user.deleteMany();
+  // Clean existing data (skipped for MongoDB single-node to avoid transaction error)
+  // await prisma.challanItem.deleteMany();
+  // await prisma.challan.deleteMany();
+  // await prisma.stockMovement.deleteMany();
+  // await prisma.followUpNote.deleteMany();
+  // await prisma.customer.deleteMany();
+  // await prisma.product.deleteMany();
+  // await prisma.user.deleteMany();
 
   // Create Users for each role
   const defaultPassword = await bcrypt.hash('password123', 10);
