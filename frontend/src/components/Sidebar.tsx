@@ -20,7 +20,7 @@ export const Sidebar: React.FC = () => {
   return (
     <aside className="sidebar">
       <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '12px' }}>
-        <div style={{ width: '36px', height: '36px', background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyCenter: 'center', justifyContent: 'center' }}>
+        <div style={{ width: '36px', height: '36px', background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <Building2 size={20} color="#fff" />
         </div>
         <div>

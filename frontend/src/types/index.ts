@@ -42,6 +42,7 @@ export interface Customer {
     email: string;
   };
   followUps?: FollowUpNote[];
+  challans?: Challan[];
   _count?: {
     followUps: number;
     challans: number;

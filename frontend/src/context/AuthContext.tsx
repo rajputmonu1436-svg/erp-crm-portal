@@ -6,6 +6,7 @@ interface AuthContextType {
   user: User | null;
   token: string | null;
   login: (email: string, password: string) => Promise<void>;
+  register: (name: string, email: string, password: string, role?: string) => Promise<void>;
   quickLogin: (role: Role) => Promise<void>;
   logout: () => void;
   loading: boolean;
@@ -50,6 +51,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const register = async (name: string, email: string, password: string, role?: string) => {
+    const res = await api.post('/auth/register', { name, email, password, role });
+    if (res.data.success) {
+      const { token, user } = res.data;
+      setToken(token);
+      setUser(user);
+      localStorage.setItem('erp_token', token);
+      localStorage.setItem('erp_user', JSON.stringify(user));
+    }
+  };
+
   const quickLogin = async (role: Role) => {
     const roleCredentials: Record<Role, { email: string; pass: string }> = {
       ADMIN: { email: 'admin@company.com', pass: 'admin123' },
@@ -70,7 +82,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, quickLogin, logout, loading }}>
+    <AuthContext.Provider value={{ user, token, login, register, quickLogin, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );
